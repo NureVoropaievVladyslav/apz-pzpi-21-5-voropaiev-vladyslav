@@ -1,6 +1,6 @@
 namespace Application.Interfaces;
 
-public interface IUserRepository
+public interface IUserRepository : IRepository<User>
 {
     Task<string> LoginAsync(string login, string password, CancellationToken cancellationToken);
     

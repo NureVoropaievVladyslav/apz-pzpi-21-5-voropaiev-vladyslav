@@ -2,6 +2,6 @@ namespace Domain.Enums;
 
 public enum Role
 {
-    Worker,
-    Admin
+    Worker = 0,
+    Admin = 1
 }
