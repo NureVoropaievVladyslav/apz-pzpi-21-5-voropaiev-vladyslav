@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+using Domain.Exceptions;
 
 namespace Presentation.Middleware;
 
@@ -20,6 +20,23 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+        }
+        catch (ExceptionBase ex)
+        {
+            _logger.LogError(ex, ex.Message);
+
+            context.Response.StatusCode = (int)ex.HttpStatusCode;
+
+            var problem = new ProblemDetails()
+            {
+                Status = (int)ex.HttpStatusCode,
+                Type = ex.HttpStatusCode.ToString(),
+                Detail = ex.Message
+            };
+
+            string problemJson = JsonSerializer.Serialize(problem);
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsync(problemJson);
         }
         catch (Exception ex)
         {

@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Presentation.Middleware;
+using Presentation.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>();
@@ -6,6 +8,10 @@ builder.Configuration.AddUserSecrets<Program>();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+builder.Services.ConfigureOptions<JwtOptionsSetup>();
+builder.Services.ConfigureOptions<JwtBearerOptionsSetup>();
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -22,5 +28,7 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
+
+app.MigrateContext();
 
 app.Run();
