@@ -1,3 +1,5 @@
+using Domain.Enums;
+
 namespace Infrastructure.Repositories;
 
 public class UserRepository : Repository<User>, IUserRepository
@@ -17,7 +19,7 @@ public class UserRepository : Repository<User>, IUserRepository
         var user = await Context.Users.FirstOrDefaultAsync(x => x.Email == login || x.Username == login, cancellationToken);
         if (user is null)
         {
-            throw new UserNotFoundException();
+            throw new DataNotFoundException();
         }
 
         if (_passwordManager.VerifyPassword(
@@ -47,5 +49,19 @@ public class UserRepository : Repository<User>, IUserRepository
         await CreateAsync(user, cancellationToken);
 
         return _jwtProvider.Generate(user);
+    }
+
+    public void MakeAdmin(User user)
+    {
+        user.Role = Role.Admin;
+        Update(user);
+    }
+
+    public async Task CheckEmailAvailabilityAsync(string email, CancellationToken cancellationToken)
+    {
+        if (await Context.Users.AnyAsync(x => x.Email == email, cancellationToken)) 
+        {
+            throw new EmailIsUnavailableException();
+        }
     }
 }

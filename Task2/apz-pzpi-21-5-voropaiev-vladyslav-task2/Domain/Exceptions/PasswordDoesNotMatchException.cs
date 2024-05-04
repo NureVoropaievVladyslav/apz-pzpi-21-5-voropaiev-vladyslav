@@ -1,3 +1,3 @@
 namespace Domain.Exceptions;
 
-public class PasswordDoesNotMatchException() : ExceptionBase("Password does not match.", HttpStatusCode.Unauthorized);
+public class PasswordDoesNotMatchException() : ExceptionBase(Resources.Resource.PasswordNoMatch, HttpStatusCode.Unauthorized);

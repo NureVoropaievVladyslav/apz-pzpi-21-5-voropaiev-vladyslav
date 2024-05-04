@@ -11,6 +11,11 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        
+        builder.Entity<Pond>()
+            .HasOne(p => p.FeedingSchedule)
+            .WithOne(fs => fs.Pond)
+            .HasForeignKey<FeedingSchedule>(fs => fs.PondId);
 
         base.OnModelCreating(builder);
     }

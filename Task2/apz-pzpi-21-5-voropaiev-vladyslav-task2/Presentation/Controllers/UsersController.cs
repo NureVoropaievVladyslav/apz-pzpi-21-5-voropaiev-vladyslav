@@ -1,8 +1,9 @@
+using Application.Features.Users.Commands.DeleteUserCommand;
+using Application.Features.Users.Commands.MakeAdminCommand;
 using Application.Features.Users.Commands.RegisterWorkerCommand;
+using Application.Features.Users.Commands.UpdateUserCommand;
 using Application.Features.Users.Queries.GetAllUsersQuery;
 using Application.Features.Users.Queries.LoginQuery;
-using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Presentation.Controllers;
 
@@ -36,6 +37,30 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> Get(CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(new GetAllUsersQuery(), cancellationToken);
+        return Ok(response);
+    }
+    
+    [Authorize(Roles = nameof(Role.Admin))]
+    [HttpDelete]
+    public async Task<ActionResult> Delete([FromQuery] Guid userId, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new DeleteUserCommand(userId), cancellationToken);
+        return Ok(response);
+    }
+
+    [Authorize(Roles = nameof(Role.Admin))]
+    [HttpPost("make-admin")]
+    public async Task<ActionResult> MakeAdmin([FromQuery] Guid userId, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(new MakeAdminCommand(userId), cancellationToken);
+        return Ok(response);
+    }
+
+    [Authorize]
+    [HttpPut]
+    public async Task<ActionResult> Update(UpdateUserCommand request, CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(request, cancellationToken);
         return Ok(response);
     }
 }

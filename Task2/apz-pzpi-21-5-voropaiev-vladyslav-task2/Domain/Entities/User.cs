@@ -15,4 +15,8 @@ public class User : BaseEntity
     public string PasswordSalt  { get; set; } = null!;
 
     public Role Role { get; set; } = Role.Worker;
+
+    public Guid? PondId { get; set; }
+    
+    public Pond? WorkArea { get; set; }
 }

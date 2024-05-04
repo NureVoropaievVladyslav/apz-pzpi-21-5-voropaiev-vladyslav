@@ -18,6 +18,8 @@ public static class InfrastructureServices
         services.AddTransient<IJwtProvider, JwtProvider>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPondRepository, PondRepository>();
+        services.AddScoped<IFeedingScheduleRepository, FeedingScheduleRepository>();
         
         return services;
     } 

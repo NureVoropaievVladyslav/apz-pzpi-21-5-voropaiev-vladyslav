@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Infrastructure.Repositories;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
@@ -9,7 +11,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         Context = context;
     }
 
-    public async Task CreateAsync(T entity, CancellationToken cancellationToken)
+    public virtual async Task CreateAsync(T entity, CancellationToken cancellationToken)
     {
         await Context.AddAsync(entity, cancellationToken);
     }
@@ -24,7 +26,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         Context.Remove(entity);
     }
 
-    public Task<T?> GetAsync(Guid id, CancellationToken cancellationToken)
+    public virtual Task<T?> GetAsync(Guid id, CancellationToken cancellationToken)
     {
         return Context.Set<T>().FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
     }
@@ -37,5 +39,18 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public IQueryable<T> GetQueryable()
     {
         return Context.Set<T>();
+    }
+
+    public async Task<string> ExportToJsonAsync(CancellationToken cancellationToken)
+    {
+        var entities = await Context.Set<T>().ToListAsync(cancellationToken);
+        return JsonConvert.SerializeObject(entities);
+    }
+
+    public async Task<ICollection<T>> ImportFromJsonAsync(string json, CancellationToken cancellationToken)
+    {
+        var importedEntities = JsonConvert.DeserializeObject<ICollection<T>>(json)!;
+        await Context.Set<T>().AddRangeAsync(importedEntities, cancellationToken);
+        return importedEntities;
     }
 }

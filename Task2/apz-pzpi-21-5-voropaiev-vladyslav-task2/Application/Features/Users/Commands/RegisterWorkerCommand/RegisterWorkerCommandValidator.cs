@@ -5,25 +5,25 @@ public class RegisterWorkerCommandValidator : AbstractValidator<RegisterWorkerCo
     public RegisterWorkerCommandValidator()
     {
         RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Fullname is required")
-            .MinimumLength(8).WithMessage("Fullname must be at least 8 characters long.");
+            .NotEmpty().WithMessage(Resource.RequiredField)
+            .MinimumLength(8).WithMessage(Resource.FullNameMustBeEightCharacters);
 
         RuleFor(x => x.Email)
-            .NotEmpty().WithMessage("Email is required.")
-            .EmailAddress().WithMessage("Provided email is not valid.");
+            .NotEmpty().WithMessage(Resource.RequiredField)
+            .EmailAddress().WithMessage(Resource.EmailNotValid);
         
         RuleFor(x => x.Username)
-            .NotEmpty().WithMessage("Username is required.")
-            .MinimumLength(5).WithMessage("Username must be at least 5 characters long.")
-            .Matches("[a-z]+$").WithMessage("Username can contain only lowercase letters.");
+            .NotEmpty().WithMessage(Resource.RequiredField)
+            .MinimumLength(5).WithMessage(Resource.UsernameMustBeFiveCharacters)
+            .Matches("[a-z]+$").WithMessage(Resource.UsernameMustContainOnlyLowercase);
 
         RuleFor(x => x.Password)
-            .NotEmpty().WithMessage("Password is required.")
-            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
-            .MaximumLength(32).WithMessage("Password must not exceed 32 characters.")
-            .Matches(@"[A-Z]+").WithMessage("Password must contain at least one uppercase letter.")
-            .Matches(@"[a-z]+").WithMessage("Password must contain at least one lowercase letter.")
-            .Matches(@"[0-9]+").WithMessage("Password must contain at least one number.")
-            .Matches(@"[\!\?\*\.]+").WithMessage("Password must contain at least one special symbol '!,?, *,.'.");
+            .NotEmpty().WithMessage(Resource.RequiredField)
+            .MinimumLength(8).WithMessage(Resource.PasswordBoundaries)
+            .MaximumLength(32).WithMessage(Resource.PasswordBoundaries)
+            .Matches(@"[A-Z]+").WithMessage(Resource.PasswordCharacters)
+            .Matches(@"[a-z]+").WithMessage(Resource.PasswordCharacters)
+            .Matches(@"[0-9]+").WithMessage(Resource.PasswordCharacters)
+            .Matches(@"[\!\?\*\.]+").WithMessage(Resource.PasswordCharacters);
     }
 }

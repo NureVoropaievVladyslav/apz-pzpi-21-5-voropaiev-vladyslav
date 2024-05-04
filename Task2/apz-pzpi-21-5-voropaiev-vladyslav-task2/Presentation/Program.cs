@@ -1,4 +1,6 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Presentation.Middleware;
 using Presentation.Options;
 
@@ -7,6 +9,7 @@ builder.Configuration.AddUserSecrets<Program>();
 
 // Add services to the container.
 
+builder.Services.AddLocalization(opt => opt.ResourcesPath = "Cultures");
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
@@ -24,6 +27,20 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseRequestLocalization(options =>
+{
+    options.SupportedCultures = [
+        new CultureInfo("en-US"),
+        new CultureInfo("uk-UA")
+    ];
+    options.SupportedUICultures = [
+        new CultureInfo("en-US"),
+        new CultureInfo("uk-UA")
+    ];
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.RequestCultureProviders = [options.RequestCultureProviders.Last()];
+});
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

@@ -22,6 +22,55 @@ namespace Infrastructure.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Entities.FeedingSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("FeedingFrequencyInHours")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("FoodAmount")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("PondId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PondId")
+                        .IsUnique();
+
+                    b.ToTable("FeedingSchedule");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Pond", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("FeedingScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("FishPopulation")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FishSpecies")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pond");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -47,6 +96,9 @@ namespace Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("PondId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
@@ -56,7 +108,36 @@ namespace Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PondId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Domain.Entities.FeedingSchedule", b =>
+                {
+                    b.HasOne("Domain.Entities.Pond", "Pond")
+                        .WithOne("FeedingSchedule")
+                        .HasForeignKey("Domain.Entities.FeedingSchedule", "PondId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pond");
+                });
+
+            modelBuilder.Entity("Domain.Entities.User", b =>
+                {
+                    b.HasOne("Domain.Entities.Pond", "WorkArea")
+                        .WithMany("Personnel")
+                        .HasForeignKey("PondId");
+
+                    b.Navigation("WorkArea");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Pond", b =>
+                {
+                    b.Navigation("FeedingSchedule");
+
+                    b.Navigation("Personnel");
                 });
 #pragma warning restore 612, 618
         }
