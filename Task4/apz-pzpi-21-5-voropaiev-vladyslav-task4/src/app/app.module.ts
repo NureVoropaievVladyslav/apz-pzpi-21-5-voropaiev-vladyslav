@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { PondsModule } from './ponds/ponds.module';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { AuthModule } from './auth/auth.module';
         AppRoutingModule,
         HttpClientModule,
         UsersModule,
-        AuthModule
+        AuthModule,
+        PondsModule
     ],
   providers: [],
   bootstrap: [AppComponent]
