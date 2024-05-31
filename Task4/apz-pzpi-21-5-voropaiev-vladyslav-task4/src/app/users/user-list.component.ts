@@ -4,6 +4,7 @@ import { User } from '../core/models/user';
 import { DatePipe } from '@angular/common';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-user-list',
@@ -14,7 +15,14 @@ import autoTable from 'jspdf-autotable';
 export class UserListComponent {
   users: User[] = [];
 
-  constructor(private usersService: UsersService) { }
+  constructor(private usersService: UsersService, public translate: TranslateService) {
+    translate.addLangs(['en', 'ua']);
+    translate.setDefaultLang('en');
+
+    const browserLang = translate.getBrowserLang();
+    // @ts-ignore
+    translate.use(browserLang.match(/en|ua/) ? browserLang : 'en');
+  }
 
   ngOnInit() {
     this.usersService.get().subscribe(users => {

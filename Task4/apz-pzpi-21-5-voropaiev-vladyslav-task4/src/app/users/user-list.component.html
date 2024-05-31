@@ -20,15 +20,18 @@
             </path>
         </svg>
     </button>
+    <select #langSelect (change)="translate.use(langSelect.value)">
+        <option *ngFor="let lang of translate.getLangs()" [value]="lang" [selected]="lang === translate.currentLang">{{ lang }}</option>
+    </select>
     <table id="users-table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Full name</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Registration date</th>
+                <th>{{ 'USERS.ID' | translate }}</th>
+                <th>{{ 'USERS.FULLNAME' | translate }}</th>
+                <th>{{ 'USERS.EMAIL' | translate }}</th>
+                <th>{{ 'USERS.USERNAME' | translate }}</th>
+                <th>{{ 'USERS.ROLE' | translate }}</th>
+                <th>{{ 'USERS.REGISTRATION_DATE' | translate }}</th>
                 <th></th>
             </tr>
         </thead>

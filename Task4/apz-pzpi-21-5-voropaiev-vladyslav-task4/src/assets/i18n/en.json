@@ -1,0 +1,11 @@
+{
+  "USERS":{
+    "TITLE": "Users",
+    "ID": "ID",
+    "FULLNAME": "Fullname",
+    "EMAIL": "Email",
+    "USERNAME": "Username",
+    "ROLE": "Role",
+    "REGISTRATION_DATE": "Registration Date"
+  }
+}
