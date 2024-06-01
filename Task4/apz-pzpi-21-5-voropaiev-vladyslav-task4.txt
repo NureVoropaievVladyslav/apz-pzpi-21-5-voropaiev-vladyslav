@@ -1,0 +1,255 @@
+1 ОПИС ПРИЙНЯТИХ ІНЖЕНЕРНИХ РІШЕНЬ ТА ВЕБ-КОМПОНЕНТІВ
+
+Для реалізації клієнтської частини проекту було прийнято рішення використати Angular, що забезпечує сучасний та ефективний підхід до розробки веб-додатків. Використання Angular дозволило організувати проект у вигляді модульної структури, що забезпечує легкість у розширенні та підтримці коду. Кожен модуль і компонент мають чітко визначену відповідальність, що сприяє зручному управлінню функціоналом та взаємодії між різними частинами системи. Компоненти системи відображені на діаграмі компонентів Angular (додаток А).
+Нижче наведено опис прийнятих інженерних рішень та використаних веб-компонентів, організованих за структурою проекту.
+Модуль auth відповідає за аутентифікацію користувачів у системі. Він містить компоненти для реєстрації, входу та виходу користувачів, а також для управління токенами аутентифікації. Це забезпечує безпечний доступ до функціоналу додатка відповідно до ролі користувача.
+У папці core знаходяться дві ключові підпапки: models та services.
+У цій папці models зберігаються моделі даних, що використовуються в додатку. Вони визначають структуру об'єктів, які передаються між клієнтською та серверною частинами.
+Папка services містить сервіси, що реалізують бізнес-логіку та забезпечують взаємодію з сервером.
+Модуль ponds призначений для управління даними, пов'язаними з бізнес логікою системи.
+Компонент navbar, що знаходиться у папці shared, є спільним для всього додатка і забезпечує навігацію між різними розділами системи. Він включає елементи меню, які дозволяють користувачам швидко переміщуватися між основними функціональними модулями додатка.
+Модуль users відповідає за управління інформацією про користувачів системи. 
+Система реалізує взаємодію з двома видами користувачів: неавторизований користувач та адміністратор. Повний функціонал, доступний для кожного з цих типів користувачів, детально описано на діаграмі прецедентів (додаток Б). 
+У додатку В знаходиться діаграма діяльності. У цій діаграмі зображені переходи всередині системи, дані, що вводять користувачі, а також результати їх дій.
+
+
+2 РЕАЛІЗАЦІЯ ВЕБ-ЧАСТИНИ СИСТЕМИ
+
+2.1 Авторизація та управління доступом користувачів
+Неавторизований користувач потрапляє на сторінку авторизації, де має можливість зареєструватися або авторизуватися:
+Рисунок 1 – Сторінка авторизації
+Цей компонент реалізує авторизацію за допомогою відповідного сервісу –auth.service.ts (додаток Г). 
+Сервіс HttpService є ключовим компонентом для здійснення HTTP-запитів у проекті. Його головна мета – забезпечити стандартизовані методи для взаємодії з сервером, включаючи відправлення GET, POST, PUT та DELETE запитів. Цей сервіс значно спрощує роботу з HTTP-запитами та обробкою відповідей, забезпечуючи централізовану обробку помилок і автоматичне додавання заголовків аутентифікації та використовується у всіх сервісах для взаємодії з сервером. Код HttpService наведено у додатку Д.
+Рисунок 2 – Початкова сторінка після авторизації
+2.2  Обробка помилок
+Обробка помилок є критичним аспектом для забезпечення надійності та стабільності роботи клієнтського додатку. У проекті використовується вищезазначений сервіс HttpService, який реалізує централізовану обробку помилок під час виконання HTTP-запитів. Це дозволяє забезпечити уніфіковану реакцію на помилки та їхнє коректне оброблення у всіх частинах додатку.
+Сервіс HttpService використовує метод handleError для обробки помилок, що можуть виникнути під час виконання HTTP-запитів. Цей метод обробляє помилки, які надходять від HttpClient, що дозволяє компонентам додатку коректно реагувати на збої.
+ 
+Рисунок 3 – Помилка при введенні хибного паролю
+
+2.3 Можливість адміністрування системи	
+Користувач має доступ до сторінок адміністрування ставів та користувачів. На цих сторінках адміністратор має доступ до таких функцій, як: видалення існуючого запису, імпорт та експорт даних, а також збереження даних у PDF формат. Для користувачів є можливість зміни іх ролі.
+Рисунок 4 – Сторінка адміністрування ставів 
+Рисунок 5 – Сторінка адміністрування користувачів  
+Для створення резервної копії даних є можливість збереження користувачів у файл з розширенням .json та завантаження користувачів з такого файлу у базу даних. Для цього на сторінці адміністрування користувачів є відповідні функції. 
+2.4 Інтернаціоналізація та локалізація
+Для забезпечення локалізації ресурсів у відповідній мові для користувача використовується модуль TranslateModule. Локалізація дозволяє додатку динамічно відображати текст та інші ресурси на різних мовах, залежно від уподобань користувача.
+Для локалізації текстових ресурсів у додатку використовуються JSON файли, які містять ключ-значення пар для перекладу. Кожен мовний файл відповідає певній мові і містить переклади для різних текстових елементів інтерфейсу. Нижче наведено приклад мовного файлу en.json, що містить переклади для розділу користувачів.
+Код файлу en.json:
+1. {
+ 2.   "USERS": {
+ 3.     "TITLE": "Users",
+ 4.     "ID": "ID",
+ 5.     "FULLNAME": "Fullname",
+ 6.     "EMAIL": "Email",
+ 7.     "USERNAME": "Username",
+ 8.     "ROLE": "Role",
+ 9.     "REGISTRATION_DATE": "Registration Date"
+10.   }
+11. }
+Рисунок 6 – Англійська версія додатку
+Рисунок 7 – Українська версія додатку
+
+2.5 Бізнес логіка
+Реалізація бізнес логіки додатка буде показана у мобільному додатку системи. На стороні клієнта, як будо визначено у документі Vision&Scope, відбувається лише частина адміністрування системи. 	
+2.6 Облік часу
+Реалізація бізнес логіки додатка буде показана у мобільному додатку системи. На стороні клієнта, як будо визначено у документі Vision&Scope, відбувається лише частина адміністрування системи. 	
+ВИСНОВКИ
+У рамках цієї лабораторної роботи була розроблена клієнтська частина проекту, що включала у себе фронтенд додаток. Були побудовані діаграми компонентів, прецедентів, станів та діаграма діяльності для проекту.
+Посилання на репозиторій проекту: https://github.com/NureVoropaievVladyslav/apz-pzpi-21-5-voropaiev-vladyslav/tree/main
+Посилання на відео: https://youtu.be/z2hTsZG04GQ
+
+
+ДОДАТОК А
+
+ 
+ Рисунок 8 – Діаграма компонентів
+
+
+
+
+ДОДАТОК Б
+ 
+
+Рисунок 9 – Діаграма прецедентів
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК В
+
+ 
+
+Рисунок 10 – Діаграма діяльності
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Г
+Код файлу AuthService:
+1. import { Injectable } from '@angular/core';
+ 2. import { HttpService } from './http.service';
+ 3. import { Router } from '@angular/router';
+ 4. import { jwtDecode } from 'jwt-decode';
+ 5. import { UserToken } from '../models/userToken';
+ 6.
+ 7. @Injectable({
+ 8.   providedIn: 'root'
+ 9. })
+10. export class AuthService {
+11.
+12.   private isAuthenticatedInterval: any;
+13.
+14.   constructor(
+15.       private http: HttpService,
+16.       private router: Router) { }
+17.
+18.   login(email: string, password: string) {
+19.     this.http.post<string>('users/login', { login: email, password: password })
+20.         .subscribe(
+21.             (token: string) => {
+22.               this.handleAuthentication(token);
+23.             },
+24.             (err) => {
+25.               alert('Invalid email or password.');
+26.             }
+27.         );
+28.   }
+29.
+30.   handleAuthentication(token: string) {
+31.     const decodedToken: UserToken = jwtDecode(token);
+32.     console.log(jwtDecode(token));
+33.     if (decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] !== 'Admin') {
+34.         alert('You do not have permission to access this application.');
+35.         return;
+36.     }
+37.
+38.     localStorage.setItem('token', token);
+39.     localStorage.setItem('userName', decodedToken.name);
+40.     localStorage.setItem('userEmail', decodedToken.email);
+41.
+42.     this.router.navigate(['/users']).then(() => window.location.reload());
+43.   }
+44.
+45.   isAuthenticated() {
+46.     const token = localStorage.getItem('token');
+47.
+48.     if (token) {
+49.       const decodedToken: UserToken = jwtDecode(token);
+50.       return decodedToken.exp > Date.now() / 1000;
+51.     }
+52.
+53.     return false;
+54.   }
+55.
+56.   startAuthenticatedCheck() {
+57.     if (this.isAuthenticatedInterval) {
+58.       clearInterval(this.isAuthenticatedInterval);
+59.     }
+60.
+61.     this.isAuthenticatedInterval = setInterval(() => {
+62.       if (!this.isAuthenticated()) {
+63.         alert('Your session has expired. Please login again.');
+64.         this.router.navigate(['/login']);
+65.       }
+66.     }, 60000);
+67.   }
+68.
+69.   logout() {
+70.     localStorage.removeItem('token');
+71.     localStorage.removeItem('userName');
+72.     localStorage.removeItem('userEmail');
+73.
+74.     this.router.navigate(['/login']).then(() => window.location.reload());
+75.   }
+76. } 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Д
+Код файлу HttpService:
+1. import { Injectable } from '@angular/core';
+ 2. import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+ 3. import { Observable, catchError, throwError } from 'rxjs';
+ 4. import { environment } from '../../../environments/environment.development';
+ 5.
+ 6. @Injectable({
+ 7.   providedIn: 'root'
+ 8. })
+ 9. export class HttpService {
+10.
+11.   private baseUrl = environment.apiUrl;
+12.
+13.   constructor(private httpClient: HttpClient) { }
+14.
+15.   get<T>(url: string): Observable<T> {
+16.     return this.httpClient.get<T>(this.buildUrl(url), this.getHeaders()).pipe(catchError(this.handleError));
+17.   }
+18.
+19.   post<T>(url: string, resource: unknown) {
+20.     return this.httpClient.post<T>(this.buildUrl(url), resource, this.getHeaders()).pipe(catchError(this.handleError));
+21.   }
+22.
+23.   delete(url: string) {
+24.     return this.httpClient.delete(`${this.buildUrl(url)}`, this.getHeaders()).pipe(catchError(this.handleError));
+25.   }
+26.
+27.   put<T>(url: string, resource: T) {
+28.     return this.httpClient.put<T>(this.buildUrl(url), resource, this.getHeaders()).pipe(catchError(this.handleError));
+29.   }
+30.
+31.   private handleError(err: HttpErrorResponse) {
+32.     return throwError(() => err);
+33.   }
+34.
+35.   private buildUrl(url: string): string {
+36.     return this.baseUrl + url;
+37.   }
+38.
+39.   private getHeaders(): { headers?: HttpHeaders } {
+40.     const token = localStorage.getItem('token');
+41.     if (token) {
+42.       const headers = new HttpHeaders({
+43.         'Authorization': `Bearer ${token}`
+44.       });
+45.       return { headers };
+46.     }
+47.     return {};
+48.   }
+49. }
+
+
+
+
+
+
+
+
+
