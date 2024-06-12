@@ -1,0 +1,232 @@
+5 РОЗРОБКА МОБІЛЬНОЇ ЧАСТИНИ ПРОЕКТУ
+5.1 Опис архітектури мобільної частини
+
+Для мобільної частини проекту було використано технології: мову програмування C# та платформу NET Multi-Platform App UI (.NET MAUI) для розробки мобільних додатків. 
+Проект побудовано з використанням принципів Domain-Driven Design (DDD), що допомогло чітко розділити відповідальність між різними частинами системи та забезпечити високу підтримуваність та розширюваність коду. Структура проекту включає наступні папки:
+Application, що містить логіку додатків, такі як сервіси та обробка команд.
+Domain – визначає основні бізнес-об'єкти та їхні правила.
+Infrastructure – реалізує взаємодію з зовнішніми системами.
+Presentation – відповідає за відображення даних та взаємодію з користувачем через UI.
+Для організації HTTP-запитів у проекті використовується HttpClientFactory (додаток А). У проекті визначено базовий клас сервісу для виконання HTTP-запитів. Цей клас надає методи для виконання HTTP-запитів різного типу, підтримуючи авторизацію за допомогою токенів доступу та обробку відповідей. Реалізація класу наведена у додатку Б.
+Мобільний застосунок передбачає реалізацію бізнес логіки системи, що була описана у документі Vision&Scope, для неавторизованого користувача наявна можливість авторизуватися. Детально можливості користувача проілюстровані на діаграмі прецедентів (додаток В).
+
+5.2 Реалізація мобільної частини системи
+5.2.1 Авторизація та управління доступом користувачів
+
+ 
+Рисунок 1 – Сторінка авторизації
+
+Після успішної авторизації, сторінка, на яку потрапляє користувач – реалізація бізнес логіки проєкту.
+
+Рисунок 2 – Початкова сторінка
+
+5.2.2 Можливість адміністрування системи
+
+Можливість адміністрування реалізована для користувача клієнтського застосунку. 
+
+5.2.3 Бізнес логіка
+
+Методи бізнес логіки реалізовані у відповідному сервісі додатку – PondService. У користувачів мобільного застосунку є можливість змінювати графіки годування для ставів, в залежності від певних умов та показників.
+Код класу PondService:
+1. namespace Infrastructure.Services
+ 2. {
+ 3.     public class PondService : ServiceBase, IPondService
+ 4.     {
+ 5.         public PondService(IHttpClientFactory httpClientFactory, AuthConfiguration authConfiguration)
+ 6.             : base(httpClientFactory, authConfiguration)
+ 7.         {
+ 8.         }
+ 9.
+10.         public async Task<List<Pond>> GetPondsAsync(CancellationToken cancellationToken)
+11.         {
+12.             return await SendRequestAsync<List<Pond>>(HttpMethod.Get, "ponds/email", cancellationToken);
+13.         }
+14.
+15.         public async Task UpdateScheduleAsync(Pond? currentEntity)
+16.         {
+17.             var request = new UpdateFeedingScheduleCommand(
+18.                 currentEntity!.FeedingSchedule.Id, 
+19.                 currentEntity!.Id, 
+20.                 currentEntity!.FeedingSchedule.FeedingFrequencyInHours, 
+21.                 currentEntity!.FeedingSchedule.FoodAmount);
+22.             await SendRequestAsync(HttpMethod.Put, "feedingSchedules", request, CancellationToken.None);
+23.         }
+24.     }
+25. }
+
+ 
+Рисунок 3 – Сторінка з бізнес логікою
+
+
+5.2.4 Локалізація
+Для локалізації мобільного застосунку використовуються файли ресурсів та в залежності від конфігурації Android пристрою користувач бачить англійську чи українську версію додатку.
+
+ 
+Рисунок 4 – Англійська версія додатку
+
+ 
+Рисунок 5 – Українська версія додатку
+
+ВИСНОВКИ
+
+У рамках цієї лабораторної роботи була розроблена мобільна частина проекту. Були побудовані діаграми компонентів, прецедентів, станів та діаграма діяльності для проекту.
+Посилання на репозиторій проекту: https://github.com/NureVoropaievVladyslav/apz-pzpi-21-5-voropaiev-vladyslav/tree/main
+Посилання на відео: 
+https://www.youtube.com/watch?v=ZQ_A2heednQ
+
+ДОДАТОК А
+Код класу HttpClientFactory:
+
+1. using Application.Abstractions.Factories;
+ 2. 
+ 3. namespace Infrastructure.Factories;
+ 4. 
+ 5. public class HttpClientFactory : IHttpClientFactory
+ 6. {
+ 7.     public HttpClient CreateHttpClient()
+ 8.     {
+ 9.         return new HttpClient() { BaseAddress = new Uri("http://10.0.2.2:8081/api/") };
+10.     }
+11. }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Б
+Код класу ServiceBase:
+1. using System.Net;
+ 2. using System.Net.Http.Headers;
+ 3. using System.Net.Http.Json;
+ 4. using System.Web;
+ 5. using Application.Abstractions.Factories;
+ 6. using Infrastructure.Configurations.Auth;
+ 7. 
+ 8. namespace Infrastructure.Services;
+ 9. 
+10. public class ServiceBase
+11. {
+12.     private readonly IHttpClientFactory _httpClientFactory;
+13.     private readonly AuthConfiguration _authConfiguration;
+14. 
+15.     public ServiceBase(IHttpClientFactory httpClientFactory, AuthConfiguration authConfiguration)
+16.     {
+17.         _httpClientFactory = httpClientFactory;
+18.         _authConfiguration = authConfiguration;
+19.     }
+20. 
+21.     public async Task SendRequestAsync<TRequest>(HttpMethod httpMethod, string apiEndpoint, TRequest requestBody,
+22.         CancellationToken cancellationToken)
+23.     {
+24.         var httpClient = _httpClientFactory.CreateHttpClient();
+25. 
+26.         var request = new HttpRequestMessage()
+27.         {
+28.             Content = JsonContent.Create(requestBody),
+29.             Method = httpMethod,
+30.             RequestUri = new Uri(apiEndpoint, UriKind.Relative)
+31.         };
+32.         
+33.         if (_authConfiguration.AccessToken is not null)
+34.         {
+35.             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authConfiguration.AccessToken);
+36.         }
+37.         
+38.         await httpClient.SendAsync(request, cancellationToken);
+39.     }
+40.     
+41.     public async Task<TResponse> SendRequestAsync<TRequest, TResponse>(HttpMethod httpMethod, string apiEndpoint, TRequest requestBody,
+42.         CancellationToken cancellationToken)
+43.     {
+44.         var httpClient = _httpClientFactory.CreateHttpClient();
+45. 
+46.         var request = new HttpRequestMessage()
+47.         {
+48.             Content = JsonContent.Create(requestBody),
+49.             Method = httpMethod,
+50.             RequestUri = new Uri(apiEndpoint, UriKind.Relative)
+51.         };
+52.         
+53.         if (_authConfiguration.AccessToken is not null)
+54.         {
+55.             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authConfiguration.AccessToken);
+56.         }
+57.         
+58.         var response = await httpClient.SendAsync(request, cancellationToken);
+59.         return await response.Content.ReadFromJsonAsync<TResponse>() ?? default;
+60.     }
+61.     
+62.     public async Task<TResponse> SendRequestAsync<TResponse>(HttpMethod httpMethod, string apiEndpoint, CancellationToken cancellationToken,
+63.         IDictionary<string, string>? queryParams = null)
+64.     {
+65.         var queryString = HttpUtility.ParseQueryString(string.Empty);
+66.         // foreach (var param in queryParams ?? new Dictionary<string, string>())
+67.         // {
+68.         //     queryString[param.Key] = param.Value;
+69.         // }
+70.         
+71.         var httpClient = _httpClientFactory.CreateHttpClient();
+72. 
+73.         var request = new HttpRequestMessage()
+74.         {
+75.             Method = httpMethod,
+76.             RequestUri = new Uri($"{apiEndpoint}{queryString}", UriKind.Relative),
+77.         };
+78.         
+79.         if (_authConfiguration.AccessToken is not null)
+80.         {
+81.             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _authConfiguration.AccessToken);
+82.         }
+83.         
+84.         var response = await httpClient.SendAsync(request, cancellationToken);
+85.         if (response.StatusCode == HttpStatusCode.Unauthorized)
+86.         {
+87.             _authConfiguration.AccessToken = null;
+88.             return default;
+89.         }
+90.         
+91.         return await response.Content.ReadFromJsonAsync<TResponse>() ?? default;
+92.     }
+93. }
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ДОДАТОК В
+ 
+
+Рисунок 7 – Діаграма прецедентів
+
+
+
+
+
+
+
+
+
+
+
+ДОДАТОК Г
+ 
+
+Рисунок 8 – Діаграма компонентів
+
